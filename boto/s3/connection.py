@@ -30,7 +30,6 @@ from boto import handler
 from boto.provider import Provider
 from boto.s3.bucket import Bucket
 from boto.s3.key import Key
-from boto.s3.mpu import InitiateMPU
 from boto.resultset import ResultSet
 from boto.exception import BotoClientError
 

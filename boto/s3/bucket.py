@@ -800,4 +800,3 @@ class Bucket(object):
 
     def delete(self, headers=None):
         return self.connection.delete_bucket(self.name, headers=headers)
-
