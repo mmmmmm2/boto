@@ -121,10 +121,12 @@ def canonical_string(method, path, headers, expires=None,
         buf += "?versions"
     elif re.search("[&?]versioning($|=|&)", path):
         buf += "?versioning"
+    elif re.search("[&?]uploads($|=|&)", path):
+        buf += "?uploads"
     else:
-        m = re.search("[&?]versionId=([^&]+)($|=|&)", path)
+        m = re.search("([&?])(versionId|uploadId|partNumber)=([^&]+)($|=|&)", path)
         if m:
-            buf += '?versionId=' + m.group(1)
+            buf += m.group(1) + m.group(2) + '=' + m.group(3)
 
     return buf
 

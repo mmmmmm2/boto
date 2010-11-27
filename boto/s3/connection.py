@@ -30,6 +30,7 @@ from boto import handler
 from boto.provider import Provider
 from boto.s3.bucket import Bucket
 from boto.s3.key import Key
+from boto.s3.mpu import InitiateMPU
 from boto.resultset import ResultSet
 from boto.exception import BotoClientError
 
@@ -398,3 +399,38 @@ class S3Connection(AWSAuthConnection):
                 data, host, auth_path, sender,
                 override_num_retries=override_num_retries)
 
+    def init_mpu(self, bucket, key):
+        query_args = 'uploads'
+        response = self.make_request('POST', bucket, key,
+                                                query_args=query_args)
+        body = response.read()
+        if response.status == 200:
+            rs = ResultSet()
+            h = handler.XmlHandler(rs, self)
+            xml.sax.parseString(body, h)
+            return rs.UploadId
+        else:
+            raise self.provider.storage_response_error(response.status,
+                response.reason, body)
+
+    def abort_mpu(self, bucket, key, upload_id):
+        query_args = 'uploadId=%s' % upload_id
+        response = self.make_request('DELETE', bucket, key,
+            query_args=query_args)
+        body = response.read()
+        if response.status != 204:
+            raise self.provider.storage_response_error(
+                response.status, response.reason, body)
+
+    def list_mpu_parts(self, bucket, key, upload_id):
+        query_args = 'uploadId=%s' % upload_id
+        response = self.make_request('GET', bucket, key, query_args=query_args)
+        body = response.read()
+        if response.status == 200:
+            rs = ResultSet()
+            h = handler.XmlHandler(rs, self)
+            xml.sax.parseString(body, h)
+            return rs
+        else:
+            raise self.provider.storage_response_error(response.status,
+                response.reason, body)
