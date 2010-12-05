@@ -124,9 +124,12 @@ def canonical_string(method, path, headers, expires=None,
     elif re.search("[&?]uploads($|=|&)", path):
         buf += "?uploads"
     else:
+        # TODO Loop on the path and get each parameter until we went through all of them
+        # TODO Also make sure they are added to the buf in alphabetical order
         m = re.search("([&?])(versionId|uploadId|partNumber)=([^&]+)($|=|&)", path)
         if m:
-            buf += m.group(1) + m.group(2) + '=' + m.group(3)
+            buf += '?' + path.split('?')[1]
+            #buf += m.group(1) + m.group(2) + '=' + m.group(3)
 
     return buf
 
